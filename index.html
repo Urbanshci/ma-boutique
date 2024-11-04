@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Afro Shop</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .img-product { height: 200px; object-fit: cover; }
+        .product-card { transition: 0.3s; }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .whatsapp-btn { background: #25D366; color: white; }
+        .whatsapp-btn:hover { background: #128C7E; color: white; }
+    </style>
+</head>
+<body>
+    <!-- En-tête -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">Afro Shop</a>
+            <div class="d-flex">
+                <a href="tel:+2250171006141" class="btn btn-outline-light">
+                    📞 +225 0171006141
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Bannière -->
+    <div class="bg-light py-4 mb-4">
+        <div class="container text-center">
+            <h1 class="display-5">Bienvenue sur Afro Shop</h1>
+            <p class="lead">Les meilleurs produits aux meilleurs prix</p>
+        </div>
+    </div>
+
+    <!-- Produits -->
+    <div class="container mb-5">
+        <div class="row" id="products"></div>
+    </div>
+
+    <!-- Modal Commande -->
+    <div class="modal fade" id="orderModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Passer la commande</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="productDetails" class="text-center mb-3"></div>
+                    <form id="orderForm">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" placeholder="Votre nom complet" 
+                                   id="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="tel" class="form-control" placeholder="Votre numéro WhatsApp" 
+                                   id="phone" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" placeholder="Votre adresse de livraison" 
+                                   id="address" required>
+                        </div>
+                        <button type="submit" class="btn whatsapp-btn w-100">
+                            Commander via WhatsApp
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="successToast" class="toast" role="alert">
+            <div class="toast-header bg-success text-white">
+                <strong class="me-auto">Succès</strong>
+                <button class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body">
+                Votre commande a été envoyée avec succès !
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Liste des produits
+        const products = [
+            {
+                id: 1,
+                name: "Sac à Main Élégant",
+                price: 15000,
+                image: "https://via.placeholder.com/400x300",
+                description: "Sac à main en cuir véritable"
+            },
+            {
+                id: 2,
+                name: "Montre Luxe",
+                price: 25000,
+                image: "https://via.placeholder.com/400x300",
+                description: "Montre élégante pour homme"
+            },
+            {
+                id: 3,
+                name: "Chaussures Sport",
+                price: 20000,
+                image: "https://via.placeholder.com/400x300",
+                description: "Chaussures de sport confortables"
+            },
+            {
+                id: 4,
+                name: "Robe de Soirée",
+                price: 35000,
+                image: "https://via.placeholder.com/400x300",
+                description: "Robe élégante pour soirée"
+            }
+        ];
+
+        // Afficher les produits
+        document.getElementById('products').innerHTML = products.map(product => `
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card product-card h-100">
+                    <img src="${product.image}" class="card-img-top img-product" alt="${product.name}">
+                    <div class="card-body">
+                        <h5 class="card-title">${product.name}</h5>
+                        <p class="card-text">${product.description}</p>
+                        <p class="card-text fw-bold">${product.price.toLocaleString()} FCFA</p>
+                        <button class="btn btn-primary w-100" onclick="openOrderModal(${product.id})">
+                            Commander
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        // Gestion des commandes
+        let selectedProduct;
+
+        function openOrderModal(productId) {
+            selectedProduct = products.find(p => p.id === productId);
+            
+            document.getElementById('productDetails').innerHTML = `
+                <h6>${selectedProduct.name}</h6>
+                <p class="text-primary fw-bold">${selectedProduct.price.toLocaleString()} FCFA</p>
+            `;
+            
+            new bootstrap.Modal(document.getElementById('orderModal')).show();
+        }
+
+        document.getElementById('orderForm').onsubmit = function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value
+            };
+
+            const message = `🛍️ Nouvelle Commande!\n
+📦 Produit: ${selectedProduct.name}
+💰 Prix: ${selectedProduct.price.toLocaleString()} FCFA\n
+👤 Informations Client:
+- Nom: ${formData.name}
+- Téléphone: ${formData.phone}
+- Adresse: ${formData.address}`;
+
+            // Ouvrir WhatsApp
+            window.open(`https://wa.me/2250171006141?text=${encodeURIComponent(message)}`, '_blank');
+
+            // Fermer le modal et montrer le toast
+            bootstrap.Modal.getInstance(document.getElementById('orderModal')).hide();
+            const toast = new bootstrap.Toast(document.getElementById('successToast'));
+            toast.show();
+
+            // Reset form
+            e.target.reset();
+        };
+    </script>
+</body>
+</html>
